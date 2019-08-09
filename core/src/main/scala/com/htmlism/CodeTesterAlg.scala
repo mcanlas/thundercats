@@ -2,6 +2,8 @@ package com.htmlism
 
 import java.nio.file.attribute.PosixFilePermission
 
+import scala.sys.process._
+
 import better.files.{ Dispose, File }
 import cats.effect._
 import cats.implicits._
@@ -30,7 +32,7 @@ class SbtProjectTester[F[_]](implicit F: Sync[F]) extends CodeTesterAlg[F] {
     makeResource(f / "project" / "build.properties")
       .use(writeSbtVersion) *>
     makeResource(f / "runner.sh")
-      .use(writeSbtRunner(f)) >>= makeExecutable
+      .use(writeSbtRunner(f)) >>= makeExecutable >>= runFile
 
   private def makeResource(f: File) =
     Resource.make(F.delay(f))(releaseTemporaryFile)
@@ -53,11 +55,16 @@ class SbtProjectTester[F[_]](implicit F: Sync[F]) extends CodeTesterAlg[F] {
       f
         .appendLine("#!/usr/bin/env bash")
         .appendLine(s"cd ${root.path}")
-        .appendLine("sbt test")
+        .appendLine("exit 1")
     }
 
   private def makeExecutable(f: File) =
     F.delay {
       chmod_+(PosixFilePermission.OWNER_EXECUTE, f)
+    }
+
+  private def runFile(f: File) =
+    F.delay {
+      Seq(f.pathAsString).!!
     }
 }
