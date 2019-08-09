@@ -1,7 +1,7 @@
 lazy val core =
   project
     .settings(commonSettings: _*)
-    .settings(libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0-M4")
+    .settings(libraryDependencies += "org.typelevel" %% "cats-core" % "2.0.0-RC1")
 
 lazy val dialectCats =
   (project in file("dialect-cats"))
