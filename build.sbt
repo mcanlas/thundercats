@@ -1,3 +1,7 @@
+lazy val root = Project("thundercats", file("."))
+  .settings(commonSettings: _*)
+  .aggregate(core, dialectCats, dialectScalaz)
+
 lazy val core =
   project
     .settings(commonSettings: _*)
