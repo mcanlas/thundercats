@@ -5,6 +5,7 @@ import java.nio.file.attribute.PosixFilePermission
 import scala.sys.process._
 
 import better.files.{ Dispose, File }
+import cats.data._
 import cats.effect._
 import cats.implicits._
 
@@ -16,8 +17,8 @@ trait CodeTesterAlg[F[_]] {
 
 class SbtProjectTester[F[_]](implicit F: Sync[F]) extends CodeTesterAlg[F] {
   def test: F[Unit] =
-    makeResource(File.newTemporaryDirectory())
-      .use(useProjectDirectoryResource)
+    makeProjectDirectoryResource
+      .use((useProjectDirectoryResource _).tupled)
       .void
 
   private def releaseTemporaryFile(f: File) =
@@ -26,13 +27,18 @@ class SbtProjectTester[F[_]](implicit F: Sync[F]) extends CodeTesterAlg[F] {
 //      f.toTemporary.foreach(_ => ())
     }
 
-  private def useProjectDirectoryResource(f: File) =
-    makeResource(f / "build.sbt")
-      .use(writeBuildSbtFile) *>
-    makeResource(f / "project" / "build.properties")
-      .use(writeSbtVersion) *>
-    makeResource(f / "runner.sh")
-      .use(writeSbtRunner(f)) >>= makeExecutable >>= runFile
+  private def makeProjectDirectoryResource =
+    for {
+      f               <- makeResource(File.newTemporaryDirectory())
+      buildFile       <- makeResource(f / "build.sbt")
+      buildProperties <- makeResource(f / "project" / "build.properties")
+      runner          <- makeResource(f / "runner.sh")
+    } yield (f, buildFile, buildProperties, runner)
+
+  private def useProjectDirectoryResource(root: File, buildFile: File, buildProperties: File, runner: File) =
+    writeBuildSbtFile(buildFile) *>
+      writeSbtVersion(buildProperties) *>
+      writeSbtRunner(root)(runner) >>= makeExecutable >>= runFile
 
   private def makeResource(f: File) =
     Resource.make(F.delay(f))(releaseTemporaryFile)
