@@ -15,10 +15,10 @@ trait CodeTesterAlg[F[_]] {
   def test: F[Unit]
 }
 
-class SbtProjectTester[F[_]](implicit F: Sync[F]) extends CodeTesterAlg[F] {
+class SbtProjectTester[F[_]](dialect: Dialect)(implicit F: Sync[F]) extends CodeTesterAlg[F] {
   def test: F[Unit] =
     makeProjectDirectoryResource
-      .use((useProjectDirectoryResource _).tupled)
+      .use((useProjectDirectoryResource(dialect) _).tupled)
       .void
 
   private def releaseTemporaryFile(f: File) =
@@ -32,21 +32,33 @@ class SbtProjectTester[F[_]](implicit F: Sync[F]) extends CodeTesterAlg[F] {
       f               <- makeResource(File.newTemporaryDirectory())
       buildFile       <- makeResource(f / "build.sbt")
       buildProperties <- makeResource(f / "project" / "build.properties")
+      scalaFile       <- makeResource(f / "src" / "main" / "scala" / "Main.scala")
       runner          <- makeResource(f / "runner.sh")
-    } yield (f, buildFile, buildProperties, runner)
+    } yield (f, buildFile, buildProperties, scalaFile, runner)
 
-  private def useProjectDirectoryResource(root: File, buildFile: File, buildProperties: File, runner: File) =
-    writeBuildSbtFile(buildFile) *>
+  private def useProjectDirectoryResource(dialect: Dialect)(root: File, buildFile: File, buildProperties: File, scalaFile: File, runner: File) =
+    writeBuildSbtFile(buildFile, dialect) *>
       writeSbtVersion(buildProperties) *>
+      writeScalaFile(scalaFile) *>
       writeSbtRunner(root)(runner) >>= makeExecutable >>= runFile
 
   private def makeResource(f: File) =
     Resource.make(F.delay(f))(releaseTemporaryFile)
 
-  private def writeBuildSbtFile(f: File) =
+  private def writeBuildSbtFile(f: File, dialect: Dialect) =
     F.delay {
+      val parts = dialect.libraryDependency
+
       f
         .appendLine("""scalaVersion := "2.13.0"""")
+        .appendLine(s"""libraryDependencies += "${parts(0)}" %% "${parts(1)}" % "${parts(2)}"""")
+    }
+
+  private def writeScalaFile(f: File) =
+    F.delay {
+      f
+        .createIfNotExists(createParents = true)
+        .appendLine("object Main extends App")
     }
 
   private def writeSbtVersion(f: File) =

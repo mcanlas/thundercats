@@ -1,6 +1,6 @@
 lazy val root = Project("thundercats", file("."))
   .settings(commonSettings: _*)
-  .aggregate(core, dialectCats, dialectScalaz)
+  .aggregate(core, `dialect-cats`, `dialect-scalaz`)
 
 lazy val core =
   project
@@ -8,13 +8,13 @@ lazy val core =
     .settings(libraryDependencies += "org.typelevel" %% "cats-effect" % "2.0.0-RC1")
     .settings(libraryDependencies += "com.github.pathikrit" %% "better-files" % "3.8.0")
 
-lazy val dialectCats =
-  (project in file("dialect-cats"))
+lazy val `dialect-cats` =
+  project
     .dependsOn(core)
     .settings(commonSettings: _*)
 
-lazy val dialectScalaz =
-  (project in file("dialect-scalaz"))
+lazy val `dialect-scalaz` =
+  project
     .dependsOn(core)
     .settings(commonSettings: _*)
 
