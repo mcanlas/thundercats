@@ -1,7 +1,7 @@
 package com.htmlism
 
-sealed abstract class PlainType
+sealed abstract class PlainType(val expr: String)
 
-case object PlaintTypeInt extends PlainType
+case object PlaintTypeInt extends PlainType("Int")
 
-case object PlaintTypeString extends PlainType
+case object PlaintTypeString extends PlainType("String")

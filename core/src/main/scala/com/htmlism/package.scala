@@ -1,10 +1,10 @@
 package com
 
 package object htmlism {
-  val Semigroup = TypeClassKindStar("Semigroup")
-  val Monoid    = TypeClassKindStar("Monoid", Semigroup)
+  val Semigroup = TypeClassForStar("Semigroup")
+  val Monoid    = TypeClassForStar("Monoid", Semigroup)
 
-  val Functor     = TypeClassKindStarStar("Functor")
-  val Applicative = TypeClassKindStarStar("Applicative", Functor)
-  val Monad       = TypeClassKindStarStar("Monad", Applicative)
+  val Functor     = TypeClassForStarStar("Functor")
+  val Applicative = TypeClassForStarStar("Applicative", Functor)
+  val Monad       = TypeClassForStarStar("Monad", Applicative)
 }

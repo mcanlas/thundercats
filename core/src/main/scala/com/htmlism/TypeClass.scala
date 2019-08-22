@@ -1,7 +1,9 @@
 package com.htmlism
 
-trait TypeClass
+trait TypeClass {
+  def name: String
+}
 
-case class TypeClassKindStar(name: String, supers: TypeClassKindStar*) extends TypeClass
+case class TypeClassForStar(name: String, supers: TypeClassForStar*) extends TypeClass
 
-case class TypeClassKindStarStar(name: String, supers: TypeClassKindStarStar*) extends TypeClass
+case class TypeClassForStarStar(name: String, supers: TypeClassForStarStar*) extends TypeClass

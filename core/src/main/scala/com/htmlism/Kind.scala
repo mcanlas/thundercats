@@ -1,9 +1,9 @@
 package com.htmlism
 
-sealed abstract class Kind
+sealed abstract class Kind(val expr: String)
 
-object KindOption extends Kind
+object KindOption extends Kind("Option")
 
-object KindList extends Kind
+object KindList extends Kind("List")
 
 
