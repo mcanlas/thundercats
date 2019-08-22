@@ -53,7 +53,7 @@ class SbtProjectTester[F[_]](implicit F: Sync[F]) extends CodeTesterAlg[F] {
     F.delay {
       f
         .createIfNotExists(createParents = true)
-        .appendLine("sbt.version=1.3.0-RC3")
+        .appendLine("sbt.version=1.3.0-RC4")
     }
 
   private def writeSbtRunner(root: File)(f: File) =
