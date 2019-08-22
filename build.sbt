@@ -10,10 +10,12 @@ lazy val core =
 
 lazy val dialectCats =
   (project in file("dialect-cats"))
+    .dependsOn(core)
     .settings(commonSettings: _*)
 
 lazy val dialectScalaz =
   (project in file("dialect-scalaz"))
+    .dependsOn(core)
     .settings(commonSettings: _*)
 
 lazy val commonSettings = List(
