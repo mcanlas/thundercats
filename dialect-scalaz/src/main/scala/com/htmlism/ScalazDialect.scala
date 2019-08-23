@@ -5,5 +5,5 @@ case object ScalazDialect extends Dialect {
     List("org.scalaz", "scalaz-core", "7.2.28")
 
   def imports: List[String] =
-    List("import scalaz._, Scalaz._")
+    List("scalaz._, Scalaz._")
 }

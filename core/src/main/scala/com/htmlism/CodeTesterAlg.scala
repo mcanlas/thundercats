@@ -39,7 +39,7 @@ class SbtProjectTester[F[_]](dialect: Dialect)(implicit F: Sync[F]) extends Code
   private def useProjectDirectoryResource(dialect: Dialect)(root: File, buildFile: File, buildProperties: File, scalaFile: File, runner: File) =
     writeBuildSbtFile(buildFile, dialect) *>
       writeSbtVersion(buildProperties) *>
-      writeScalaFile(scalaFile) *>
+      writeScalaFile(scalaFile, dialect) *>
       writeSbtRunner(root)(runner) >>= makeExecutable >>= runFile
 
   private def makeResource(f: File) =
@@ -54,11 +54,15 @@ class SbtProjectTester[F[_]](dialect: Dialect)(implicit F: Sync[F]) extends Code
         .appendLine(s"""libraryDependencies += "${parts(0)}" %% "${parts(1)}" % "${parts(2)}"""")
     }
 
-  private def writeScalaFile(f: File) =
+  private def writeScalaFile(f: File, dialect: Dialect) =
     F.delay {
       f
         .createIfNotExists(createParents = true)
         .appendLine("object Main extends App")
+
+      dialect.imports
+        .map("import " + _)
+        .foreach(f.appendLine(_))
     }
 
   private def writeSbtVersion(f: File) =
