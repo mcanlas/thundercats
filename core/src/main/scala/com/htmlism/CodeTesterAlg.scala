@@ -77,7 +77,7 @@ class SbtProjectTester[F[_]](dialect: Dialect)(implicit F: Sync[F]) extends Code
       f
         .appendLine("#!/usr/bin/env bash")
         .appendLine(s"cd ${root.path}")
-        .appendLine("exit 1")
+        .appendLine("sbt run")
     }
 
   private def makeExecutable(f: File) =
@@ -87,6 +87,8 @@ class SbtProjectTester[F[_]](dialect: Dialect)(implicit F: Sync[F]) extends Code
 
   private def runFile(f: File) =
     F.delay {
-      Seq(f.pathAsString).!!
+      println {
+        Seq(f.pathAsString).!!
+      }
     }
 }

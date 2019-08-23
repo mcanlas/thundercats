@@ -1,6 +1,6 @@
 lazy val root = Project("thundercats", file("."))
   .settings(commonSettings: _*)
-  .aggregate(core, `dialect-cats`, `dialect-scalaz`)
+  .aggregate(core, `dialect-cats`, `dialect-scalaz`, console)
 
 lazy val core =
   project
@@ -17,6 +17,11 @@ lazy val `dialect-scalaz` =
   project
     .dependsOn(core)
     .settings(commonSettings: _*)
+
+lazy val console =
+  project
+    .settings(commonSettings: _*)
+    .dependsOn(core, `dialect-cats`, `dialect-scalaz`)
 
 lazy val commonSettings = List(
   scalaVersion := "2.13.0")
